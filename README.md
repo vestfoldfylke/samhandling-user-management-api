@@ -16,9 +16,9 @@ Create `local.settings.json` with the following content:
 ```
 
 > [!IMPORTANT]
-> Replace `security-key-X` with an actual generated security key and the correct corresponding domains for this security key.<br />
-> Only the security keys specified will be allowed to access the API.<br />
-> This API will only consider users who have an email address in the specified domains for the given security key.
+> - Replace `security-key-X` with an actual generated security key and the correct corresponding domains for this security key.<br />
+> - Only the security keys specified will be allowed to access the API.<br />
+> - This API will only consider users who have an email address in the specified domains for the given security key.
 
 ## Usage
 
