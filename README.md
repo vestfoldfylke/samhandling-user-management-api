@@ -31,7 +31,7 @@ All calls to this API must include two separate security keys:
 
 ## Endpoints
 
-### Members
+### members
 
 > **GET** /api/members/{groupId}
 
