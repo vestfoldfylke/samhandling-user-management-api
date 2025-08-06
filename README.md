@@ -31,8 +31,8 @@ All calls to this API must include two separate security keys:
 
 ## Endpoints
 
-### GroupMembers
+### Members
 
-> **GET** /api/GroupMembers
+> **GET** /api/members/{groupId}
 
-Will return all members (matching specified domains for current security-key) of specified group
+Will return all members (matching specified domains for current security-key) from specified groupId
