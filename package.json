@@ -1,7 +1,12 @@
 {
-  "name": "",
+  "name": "samhandling-user-management-api",
   "version": "1.0.0",
   "description": "",
+  "author": {
+    "email": "rune.moskvil.lyngas@vestfoldfylke.no",
+    "name": "Rune Moskvil Lyngås",
+    "url": "https://github.com/runely"
+  },
   "main": "dist/src/functions/*.js",
   "scripts": {
     "build": "tsc",
@@ -12,12 +17,12 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@azure/functions": "^4.0.0"
+    "@azure/functions": "^4.7.2"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.x",
     "@types/node": "18.x",
-    "typescript": "^4.0.0",
-    "rimraf": "^5.0.0"
+    "azure-functions-core-tools": "^4.1.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.2"
   }
 }
