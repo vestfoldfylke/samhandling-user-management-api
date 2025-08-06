@@ -1,10 +1,10 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { HTTPError } from "../lib/HTTPError";
+import { HTTPError } from "../lib/HTTPError"
 
 import { countyValidation } from "../lib/county-validation"
 
-export async function GetGroupMembers(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
-  let allowedUpnSuffixes: string[];
+export async function GroupMembers(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+  let allowedUpnSuffixes: string[]
 
   try {
     allowedUpnSuffixes = countyValidation(request, context)
@@ -19,14 +19,14 @@ export async function GetGroupMembers(request: HttpRequest, context: InvocationC
     }
   }
 
-  const message = `Will return group members where user principal name ends in one of [${allowedUpnSuffixes.join(', ')}]`
+  const message = `Will return group members matching specified domains for current security-key : [${allowedUpnSuffixes.join(', ')}]`
   context.log(message)
 
   return { body: message }
 }
 
-app.http('GetGroupMembers', {
+app.http('GroupMembers', {
   methods: ['GET'],
   authLevel: 'anonymous',
-  handler: GetGroupMembers
+  handler: GroupMembers
 })

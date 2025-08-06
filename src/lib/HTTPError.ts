@@ -1,4 +1,4 @@
-import { HttpResponseInit } from "@azure/functions";
+import { HttpResponseInit } from "@azure/functions"
 
 export class HTTPError extends Error {
   public status: number
@@ -6,11 +6,12 @@ export class HTTPError extends Error {
 
   constructor(status: number, message: string) {
     super(message)
+
     this.status = status
     this.body = message
     this.name = 'HTTPError'
   }
-  
+
   toResponse(): HttpResponseInit {
     try {
       return {
