@@ -1,3 +1,4 @@
+import { logger } from "@vtfk/logger"
 import { getEntraIdToken } from "./get-entraid-token"
 import { HTTPError } from "./HTTPError";
 
@@ -22,7 +23,8 @@ async function getGroupIdByDisplayName(groupName: string): Promise<string> {
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to fetch group id: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to fetch group id: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   const data: any = await response.json()
@@ -48,7 +50,8 @@ async function getUserIdByMail(userMail: string): Promise<string> {
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to fetch user id: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to fetch user id: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   const data: any = await response.json()
@@ -77,10 +80,12 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to invite user: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to invite user: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   const data: any = await response.json()
+  logger('info', [`Invited user ${data.invitedUser.id} with display name ${data.invitedUser.displayName} and email ${userMail}`])
   return data.invitedUser.id
 }
 
@@ -95,7 +100,8 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to fetch group members: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to fetch group members: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   const data: any = await response.json()
@@ -134,7 +140,8 @@ export async function addGroupMember(groupName: string, userMail: string, displa
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to add group member: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to add group member: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   return response.status
@@ -152,7 +159,8 @@ export async function removeGroupMember(groupName: string, userMail: string): Pr
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to remove group member: ${response.statusText}`)
+    const errorData = await response.json()
+    throw new HTTPError(response.status, `Failed to remove group member: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
   return response.status

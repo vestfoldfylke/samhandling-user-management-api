@@ -1,4 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
+import { logger } from "@vtfk/logger"
 import { errorHandling } from "../middleware/error-handling"
 import { HTTPError } from "../lib/HTTPError"
 
@@ -22,6 +23,7 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
   }
 
   const status: number = await removeGroupMember(groupName, userMail)
+  logger('info', [`${userMail} removed from ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
 
   return { status }
 }

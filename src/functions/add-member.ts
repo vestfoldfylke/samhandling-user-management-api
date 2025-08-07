@@ -1,4 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
+import { logger } from "@vtfk/logger"
 import { errorHandling } from "../middleware/error-handling"
 import { HTTPError } from "../lib/HTTPError"
 
@@ -31,6 +32,7 @@ export async function addMember(request: HttpRequest, context: InvocationContext
   }
 
   const status: number = await addGroupMember(groupName, mail, displayName)
+  logger('info', [`${mail} added to ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
 
   return { status }
 }

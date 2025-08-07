@@ -12,6 +12,9 @@ Create `local.settings.json` with the following content:
     "AZURE_CLIENT_ID": "client-id",
     "AZURE_CLIENT_SECRET": "client-secret",
     "AZURE_TENANT_ID": "tenant-id",
+    "BETTERSTACK_URL": "url-to-betterstack",
+    "BETTERSTACK_TOKEN": "betterstack-token",
+    "TEAMS_WEBHOOK_URL": "teams-flow-webhook-url",
     "security-key-1": "foo.no,bar.no",
     "security-key-2": "biz.no"
   }
