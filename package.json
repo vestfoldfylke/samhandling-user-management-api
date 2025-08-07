@@ -17,7 +17,9 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@azure/functions": "^4.7.2"
+    "@azure/functions": "^4.7.2",
+    "@azure/msal-node": "^3.7.0",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "@types/node": "18.x",
