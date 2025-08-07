@@ -29,7 +29,7 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
 }
 
 app.deleteRequest('removeMember', {
-  authLevel: 'anonymous',
+  authLevel: 'function',
   route: 'members/{groupName}/{userMail}',
   handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await errorHandling(request, context, removeMember)
 })

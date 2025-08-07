@@ -38,7 +38,7 @@ export async function addMember(request: HttpRequest, context: InvocationContext
 }
 
 app.post('addMember', {
-  authLevel: 'anonymous',
+  authLevel: 'function',
   route: 'members/{groupName}',
   handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await errorHandling(request, context, addMember)
 })

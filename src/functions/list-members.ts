@@ -21,7 +21,7 @@ export async function members(request: HttpRequest, context: InvocationContext):
 }
 
 app.get('members', {
-  authLevel: 'anonymous',
+  authLevel: 'function',
   route: 'members/{groupName}',
   handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => await errorHandling(request, context, members)
 })
