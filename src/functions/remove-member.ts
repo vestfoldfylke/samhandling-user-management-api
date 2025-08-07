@@ -17,10 +17,13 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
   }
 
   const allowedUpnSuffixes: string[] = countyValidation(request, context)
+  if (!allowedUpnSuffixes.some(suffix => userMail.endsWith(suffix))) {
+    throw new HTTPError(403, `Forbidden: User mail does not match any of the allowed UPN suffixes: [${allowedUpnSuffixes.join(', ')}]`)
+  }
 
-  const response: number = await removeGroupMember(groupName, userMail)
+  const status: number = await removeGroupMember(groupName, userMail)
 
-  return { body: response.toString() }
+  return { status }
 }
 
 app.deleteRequest('removeMember', {

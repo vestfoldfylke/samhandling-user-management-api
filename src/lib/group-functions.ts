@@ -15,13 +15,14 @@ const getGraphHeaders: (scope: string) => Promise<HeadersInit> = async (scope: s
 async function getGroupIdByDisplayName(groupName: string): Promise<string> {
   const url = `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent(groupName)}'&$select=id,displayName`
   const headers: HeadersInit = await getGraphHeaders(scope)
-  
+
   const response: Response = await fetch(url, {
     method: "GET",
     headers
   })
+
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to fetch group ID: ${response.statusText}`)
+    throw new HTTPError(response.status, `Failed to fetch group id: ${response.statusText}`)
   }
 
   const data: any = await response.json()
@@ -47,7 +48,7 @@ async function getUserIdByMail(userMail: string): Promise<string> {
   })
 
   if (!response.ok) {
-    throw new HTTPError(response.status, `Failed to fetch user ID: ${response.statusText}`)
+    throw new HTTPError(response.status, `Failed to fetch user id: ${response.statusText}`)
   }
 
   const data: any = await response.json()
@@ -56,6 +57,31 @@ async function getUserIdByMail(userMail: string): Promise<string> {
   }
 
   return data.id
+}
+
+async function inviteUserByMail(userMail: string, displayName: string): Promise<string> {
+  const url = `https://graph.microsoft.com/v1.0/invitations`
+  const headers: HeadersInit = await getGraphHeaders(scope)
+
+  const body = JSON.stringify({
+    invitedUserEmailAddress: userMail,
+    invitedUserDisplayName: displayName,
+    inviteRedirectUrl: "https://samhandling.org",
+    sendInvitationMessage: false
+  })
+
+  const response: Response = await fetch(url, {
+    method: "POST",
+    headers,
+    body
+  })
+
+  if (!response.ok) {
+    throw new HTTPError(response.status, `Failed to invite user: ${response.statusText}`)
+  }
+
+  const data: any = await response.json()
+  return data.invitedUser.id
 }
 
 export async function listGroupMembers(groupName: string, allowedUpnSuffixes: string[]): Promise<string[]> {
@@ -73,7 +99,6 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
   }
 
   const data: any = await response.json()
-  console.log(data.value.slice(-1))
   return data.value
     .filter((member: any): boolean => member.mail && allowedUpnSuffixes.some(suffix => member.mail.endsWith(suffix)))
     .map((member: any) => {
@@ -81,12 +106,23 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
     })
 }
 
-export async function addGroupMember(groupName: string, userMail: string): Promise<number> {
+export async function addGroupMember(groupName: string, userMail: string, displayName: string): Promise<number> {
   const groupId: string = await getGroupIdByDisplayName(groupName)
+
+  let userId: string
+  try {
+    userId = await getUserIdByMail(userMail)
+  } catch (error) {
+    if (error instanceof HTTPError && error.status === 404) {
+      userId = await inviteUserByMail(userMail, displayName)
+    } else {
+      throw error
+    }
+  }
+
   const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`
   const headers: HeadersInit = await getGraphHeaders(scope)
 
-  const userId = await getUserIdByMail(userMail)
   const body = JSON.stringify({
     "@odata.id": `https://graph.microsoft.com/v1.0/directoryObjects/${userId}`
   })
@@ -118,6 +154,6 @@ export async function removeGroupMember(groupName: string, userMail: string): Pr
   if (!response.ok) {
     throw new HTTPError(response.status, `Failed to remove group member: ${response.statusText}`)
   }
-  
+
   return response.status
 }
