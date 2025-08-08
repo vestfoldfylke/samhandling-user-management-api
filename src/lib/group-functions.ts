@@ -85,7 +85,7 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
   }
 
   const data: any = await response.json()
-  logger('info', [`Invited user ${data.invitedUser.id} with display name ${data.invitedUser.displayName} and email ${userMail}`])
+  logger('info', [`Invited user with display name '${data.invitedUserDisplayName}', email '${data.invitedUserEmailAddress}' and id '${data.invitedUser.id}'`, data])
   return data.invitedUser.id
 }
 
