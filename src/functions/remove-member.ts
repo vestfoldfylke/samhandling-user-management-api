@@ -4,7 +4,7 @@ import { errorHandling } from "../middleware/error-handling"
 import { HTTPError } from "../lib/HTTPError"
 
 import { countyValidation } from "../lib/county-validation"
-import { removeGroupMember } from "../lib/group-functions";
+import { removeGroupMember } from "../lib/entra-functions"
 
 export async function removeMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   const groupName: string = request.params.groupName

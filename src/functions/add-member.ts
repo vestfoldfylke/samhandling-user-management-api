@@ -4,7 +4,7 @@ import { errorHandling } from "../middleware/error-handling"
 import { HTTPError } from "../lib/HTTPError"
 
 import { countyValidation } from "../lib/county-validation"
-import { addGroupMember } from "../lib/group-functions";
+import { addGroupMember } from "../lib/entra-functions"
 
 type AddMemberRequest = {
   displayName: string;

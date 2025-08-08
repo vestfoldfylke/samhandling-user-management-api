@@ -4,7 +4,7 @@ import { errorHandling } from "../middleware/error-handling"
 import { HTTPError } from "../lib/HTTPError"
 
 import { countyValidation } from "../lib/county-validation"
-import { listGroupMembers } from "../lib/group-functions";
+import { listGroupMembers } from "../lib/entra-functions"
 
 export async function members(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   const groupName: string = request.params.groupName
