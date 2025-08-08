@@ -91,7 +91,7 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
 
 export async function listGroupMembers(groupName: string, allowedUpnSuffixes: string[]): Promise<string[]> {
   const groupId: string = await getGroupIdByDisplayName(groupName)
-  const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$top=999`
+  const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members?$select=id,mail,displayName,proxyAddresses&$top=999`
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
@@ -107,9 +107,6 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
   const data: any = await response.json()
   return data.value
     .filter((member: any): boolean => member.mail && allowedUpnSuffixes.some(suffix => member.mail.endsWith(suffix)))
-    .map((member: any) => {
-      return { id: member.id, mail: member.mail, displayName: member.displayName }
-    })
 }
 
 export async function addGroupMember(groupName: string, userMail: string, displayName: string): Promise<number> {
