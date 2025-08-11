@@ -14,7 +14,7 @@
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
-    "test": "echo \"No tests yet...\""
+    "test": "jest"
   },
   "dependencies": {
     "@azure/functions": "^4.7.2",
@@ -23,8 +23,11 @@
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "18.x",
+    "jest": "^30.0.5",
     "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.1",
     "typescript": "^5.9.2"
   }
 }
