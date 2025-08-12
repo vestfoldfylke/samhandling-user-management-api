@@ -28,7 +28,7 @@ export async function addMember(request: HttpRequest, context: InvocationContext
 
   const allowedUpnSuffixes: string[] = countyValidation(request, context, mail)
 
-  const status: number = await addGroupMember(groupName, mail, displayName)
+  const status: number = await addGroupMember(groupName, mail, displayName, context)
   logger('info', [`${mail} added to ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
 
   return { status }
