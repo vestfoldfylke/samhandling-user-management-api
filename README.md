@@ -1,6 +1,6 @@
 # Samhandling User Management API
 
-## Setup
+## Setup for local development
 
 Create `local.settings.json` with the following content:
 ```json
@@ -30,6 +30,22 @@ Create `local.settings.json` with the following content:
 >   - GroupMember.ReadWrite.All
 >   - User.Invitations
 >   - User.ReadWrite.All
+
+## Setup for Azure Function App in Samhandling.org
+
+### Setup county keys
+
+Add a new Environment variable in the Azure Function App with the name `Organisasjon_RandomGUID` and set the value to a comma-separated list of domains that should be allowed for this security key.<br />
+A random GUID can be generated using an online GUID generator, by using the `uuid` command in a terminal or `New-GUID` in PowerShell
+
+Example:
+```text
+Organisasjonsprefix_12345678-1234-1234-1234-123456789012 = foo.no,bar.no
+```
+
+### Setup Function App keys
+
+Add a new Function App key in the Azure Function App with the name `Organisasjon` and generate a random key value/pair (link in the bottom right corner)
 
 ## Usage
 
