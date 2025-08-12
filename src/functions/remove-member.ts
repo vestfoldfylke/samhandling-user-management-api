@@ -21,10 +21,10 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
     throw new HTTPError(400, 'Bad Request: Missing parameter mail')
   }
 
-  const allowedUpnSuffixes: string[] = countyValidation(request, context, mail)
+  countyValidation(request, context, mail)
 
   const status: number = await removeGroupMember(groupName, mail)
-  logger('info', [`${mail} removed from ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
+  logger('info', [`${mail} removed from group '${groupName}'`], context)
 
   return { status }
 }

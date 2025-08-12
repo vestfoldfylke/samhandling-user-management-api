@@ -26,10 +26,10 @@ export async function addMember(request: HttpRequest, context: InvocationContext
     throw new HTTPError(400, 'Bad Request: Missing mail in request body')
   }
 
-  const allowedUpnSuffixes: string[] = countyValidation(request, context, mail)
+  countyValidation(request, context, mail)
 
   const status: number = await addGroupMember(groupName, mail, displayName, context)
-  logger('info', [`${mail} added to ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
+  logger('info', [`${mail} added to group '${groupName}'`], context)
 
   return { status }
 }

@@ -15,7 +15,7 @@ export async function members(request: HttpRequest, context: InvocationContext):
   const allowedUpnSuffixes: string[] = countyValidation(request, context)
 
   const members: string[] = await listGroupMembers(groupName, allowedUpnSuffixes)
-  logger('info', [`Found ${members.length} members in group ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
+  logger('info', [`Found ${members.length} members in group '${groupName}'`], context)
 
   return { jsonBody: members }
 }
