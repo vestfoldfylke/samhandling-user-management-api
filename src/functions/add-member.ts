@@ -1,14 +1,14 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions"
-import { logger } from "@vtfk/logger"
-import { errorHandling } from "../middleware/error-handling"
-import { HTTPError } from "../lib/HTTPError"
+import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
+import { logger } from '@vtfk/logger'
+import { errorHandling } from '../middleware/error-handling'
+import { HTTPError } from '../lib/HTTPError'
 
-import { countyValidation } from "../lib/county-validation"
-import { addGroupMember } from "../lib/entra-functions"
+import { countyValidation } from '../lib/county-validation'
+import { addGroupMember } from '../lib/entra-functions'
 
 type AddMemberRequest = {
-  displayName: string;
-  mail: string;
+  displayName: string
+  mail: string
 }
 
 export async function addMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
@@ -19,17 +19,14 @@ export async function addMember(request: HttpRequest, context: InvocationContext
 
   const { displayName, mail } = await request.json() as AddMemberRequest
   if (!displayName) {
-    throw new HTTPError(400, 'Bad Request: Missing displayName')
+    throw new HTTPError(400, 'Bad Request: Missing displayName in request body')
   }
 
   if (!mail) {
-    throw new HTTPError(400, 'Bad Request: Missing mail')
+    throw new HTTPError(400, 'Bad Request: Missing mail in request body')
   }
 
-  const allowedUpnSuffixes: string[] = countyValidation(request, context)
-  if (!allowedUpnSuffixes.some(suffix => mail.endsWith(suffix))) {
-    throw new HTTPError(403, `Forbidden: User mail does not match any of the allowed UPN suffixes: [${allowedUpnSuffixes.join(', ')}]`)
-  }
+  const allowedUpnSuffixes: string[] = countyValidation(request, context, mail)
 
   const status: number = await addGroupMember(groupName, mail, displayName)
   logger('info', [`${mail} added to ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
