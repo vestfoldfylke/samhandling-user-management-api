@@ -19,10 +19,11 @@ export function countyValidation(request: HttpRequest, context: InvocationContex
     throw new HTTPError(401, 'Unauthorized: Invalid security key in header or query string')
   }
 
-  const allowedUpnSuffixes: string[] = allowedUpnSuffixString.split(',')
+  const allowedUpnSuffixes: string[] = allowedUpnSuffixString.split(',').map(suffix => suffix.trim().toLowerCase())
+  const userMail = mail ? mail.trim().toLowerCase() : null
 
-  if (mail && !allowedUpnSuffixes.some(suffix => mail.endsWith(suffix))) {
-    throw new HTTPError(403, `Forbidden: User mail (${mail}) does not match any of the allowed UPN suffixes: [${allowedUpnSuffixes.join(', ')}]`)
+  if (userMail && !allowedUpnSuffixes.some(suffix => userMail.endsWith(suffix))) {
+    throw new HTTPError(403, `Forbidden: User mail (${userMail}) does not match any of the allowed UPN suffixes: [${allowedUpnSuffixes.join(', ')}]`)
   }
 
   logConfig({

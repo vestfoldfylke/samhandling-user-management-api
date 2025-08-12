@@ -167,7 +167,10 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
 
   const data: any = await response.json()
   return data.value
-    .filter((member: any): boolean => member.mail && allowedUpnSuffixes.some(suffix => member.mail.endsWith(suffix)))
+    .filter((member: any): boolean => {
+      const userMail: string = member.mail.trim().toLowerCase()
+      return allowedUpnSuffixes.some(suffix => userMail.endsWith(suffix))
+    })
 }
 
 export async function addGroupMember(groupName: string, userMail: string, displayName: string, context: InvocationContext): Promise<number> {
