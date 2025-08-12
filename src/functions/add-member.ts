@@ -31,7 +31,7 @@ export async function addMember(request: HttpRequest, context: InvocationContext
     throw new HTTPError(403, `Forbidden: User mail does not match any of the allowed UPN suffixes: [${allowedUpnSuffixes.join(', ')}]`)
   }
 
-  const status: number = await addGroupMember(groupName, mail, displayName)
+  const status: number = await addGroupMember(groupName, mail, displayName, context)
   logger('info', [`${mail} added to ${groupName}`, 'Suffixes', `[${allowedUpnSuffixes.join(',')}]`], context)
 
   return { status }

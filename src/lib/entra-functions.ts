@@ -1,3 +1,4 @@
+import { InvocationContext } from "@azure/functions";
 import { logger } from "@vtfk/logger"
 import { getEntraIdToken } from "./get-entraid-token"
 import { HTTPError } from "./HTTPError";
@@ -91,7 +92,7 @@ async function getUserById(userId: string): Promise<any> {
   return response.json()
 }
 
-async function inviteUserByMail(userMail: string, displayName: string): Promise<InvitedUser> {
+async function inviteUserByMail(userMail: string, displayName: string, context: InvocationContext): Promise<InvitedUser> {
   const url = `https://graph.microsoft.com/v1.0/invitations`
   const headers: HeadersInit = await getGraphHeaders(scope)
 
@@ -114,13 +115,13 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
   }
 
   const data: any = await response.json()
-  logger('info', [`Invited user with display name '${data.invitedUserDisplayName}', email '${data.invitedUserEmailAddress}' and id '${data.invitedUser.id}'`, data])
+  logger('info', [`Invited user with display name '${data.invitedUserDisplayName}', email '${data.invitedUserEmailAddress}' and id '${data.invitedUser.id}'`, JSON.stringify(data, null, 2)], context)
 
   const user = await getUserById(data.invitedUser.id)
   let patched = false
   if (user.mail.toLowerCase() !== userMail.toLowerCase()) {
-    logger('info', [`Will patch user with id '${data.invitedUser.id}' to have mail '${userMail}'`, user])
-    patched = await patchUser(data.invitedUser.id, userMail)
+    logger('info', [`Will patch user with id '${data.invitedUser.id}' to have mail '${userMail}'`, JSON.stringify(user, null, 2)], context)
+    patched = await patchUser(data.invitedUser.id, userMail, context)
   }
 
   return {
@@ -129,7 +130,7 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
   }
 }
 
-async function patchUser(userId: string, userMail: string): Promise<boolean> {
+async function patchUser(userId: string, userMail: string, context: InvocationContext): Promise<boolean> {
   const url = `https://graph.microsoft.com/v1.0/users/${userId}`
   const headers: HeadersInit = await getGraphHeaders(scope)
 
@@ -148,7 +149,7 @@ async function patchUser(userId: string, userMail: string): Promise<boolean> {
     throw new HTTPError(response.status, `Failed to patch user: ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`)
   }
 
-  logger('warn', [`Patched user with id '${userId}' to have mail '${userMail}'`])
+  logger('warn', [`Patched user with id '${userId}' to have mail '${userMail}'`], context)
 
   return true
 }
@@ -173,7 +174,7 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
     .filter((member: any): boolean => member.mail && allowedUpnSuffixes.some(suffix => member.mail.endsWith(suffix)))
 }
 
-export async function addGroupMember(groupName: string, userMail: string, displayName: string): Promise<number> {
+export async function addGroupMember(groupName: string, userMail: string, displayName: string, context: InvocationContext): Promise<number> {
   const groupId: string = await getGroupIdByDisplayName(groupName)
 
   let userId: string
@@ -182,7 +183,7 @@ export async function addGroupMember(groupName: string, userMail: string, displa
     userId = await getUserIdByMail(userMail)
   } catch (error) {
     if (error instanceof HTTPError && error.status === 404) {
-      const invitedUser: InvitedUser = await inviteUserByMail(userMail, displayName)
+      const invitedUser: InvitedUser = await inviteUserByMail(userMail, displayName, context)
       userId = invitedUser.id
       patched = invitedUser.patched
     } else {
