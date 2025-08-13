@@ -1,6 +1,6 @@
 # Samhandling User Management API
 
-## Setup
+## Setup for local development
 
 Create `local.settings.json` with the following content:
 ```json
@@ -15,6 +15,7 @@ Create `local.settings.json` with the following content:
     "BETTERSTACK_URL": "url-to-betterstack",
     "BETTERSTACK_TOKEN": "betterstack-token",
     "TEAMS_WEBHOOK_URL": "teams-flow-webhook-url",
+    "NODE_ENV": "production",
     "security-key-1": "foo.no,bar.no",
     "security-key-2": "biz.no"
   }
@@ -28,7 +29,23 @@ Create `local.settings.json` with the following content:
 > - Replace AZURE_CLIENT* entries with an app registration which has the following application permissions:
 >   - GroupMember.ReadWrite.All
 >   - User.Invitations
->   - User.ReadAll
+>   - User.ReadWrite.All
+
+## Setup for Azure Function App in Samhandling.org
+
+### Setup county keys
+
+Add a new Environment variable in the Azure Function App with the name `Organisasjon_RandomGUID` and set the value to a comma-separated list of domains that should be allowed for this security key.<br />
+A random GUID can be generated using an online GUID generator, by using the `uuid` command in a terminal or `New-GUID` in PowerShell
+
+Example:
+```text
+Organisasjonsprefix_12345678-1234-1234-1234-123456789012 = foo.no,bar.no
+```
+
+### Setup Function App keys
+
+Add a new Function App key in the Azure Function App with the name `Organisasjon` and generate a random key value/pair (link in the bottom right corner)
 
 ## Usage
 
@@ -45,26 +62,40 @@ All calls to this API must include two separate security keys:
 
 > **GET** /api/members/{groupName}
 
-Return all members (matching specified domains for current security-key) from specified groupName
+Returns all members (matching specified domains for current security-key) from specified groupName.
+```json
+[
+  {
+    "@odata.type": "#microsoft.graph.user",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "mail": "mail@foo.no",
+    "displayName": "Mail Foo",
+    "proxyAddresses": [
+      "SMTP:mail@foo.no"
+    ]
+  }
+]
+```
 
 ### Add member
 
 > **POST** /api/members/{groupName}
 ```json
 {
-  "mail": "foo@bar.no",
-  "displayName": "Foo Bar"
+  "displayName": "Foo Bar",
+  "mail": "foo@bar.no"
 }
 ```
 
-If specified mail is not in the domains specified for the current security-key, it will return a `403 Forbidden` response.<br />
-If the user doesn't exist in **Samhandling.org**, the user will be invited to join. Then the invited user will be added to `groupName`<br />
-If the user already exists in **Samhandling.org**, the user will be added to `groupName`<br />
+- If specified mail is not in the domains specified for the current security-key, it will return a `403 Forbidden` response.
+- If the user doesn't exist in **Samhandling.org**, the user will be invited to join. Then the invited user will be added to `groupName`.
+- If a previously invited user has changed their mail address, the user will be invited on their new mail address and linked to the existing user in **Samhandling.org** (on the previously invited mail address). The mail address on the previously invited user in **Samhandling.org** will be updated to the new mail address, and the user will be added to `groupName`.
+- If the user already exists in **Samhandling.org**, the user will be added to `groupName` (if not already a member).
 
 ### Remove member
 
-> **DELETE** /api/members/{groupName}/{userMail}
+> **DELETE** /api/members/{groupName}/{mail}
 
-If specified mail is not in the domains specified for the current security-key, it will return a `403 Forbidden` response.<br />
-If the user is a member of the specified group, the user will be removed from `groupName`.<br />
-**The user will not be removed from Samhandling.org, only from the specified group.**
+- If specified mail is not in the domains specified for the current security-key, it will return a `403 Forbidden` response.
+- If the user is a member of the specified group, the user will be removed from `groupName`.
+  - **The user itself will not be removed from **Samhandling.org**, only removed as a member of `groupName`.**
