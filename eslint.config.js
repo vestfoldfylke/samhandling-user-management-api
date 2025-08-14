@@ -2,11 +2,23 @@ import eslintPluginTs from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 
 const commonRules = {
-  '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_$'}],
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      argsIgnorePattern: '^_$',
+      varsIgnorePattern: '^_$'
+    }
+  ],
   '@typescript-eslint/no-explicit-any': 'error',
   'semi': ['error', 'never'],
-  '@typescript-eslint/explicit-function-return-type': 'warn',
-  'quotes': ['error', 'single', { 'avoidEscape': true }]
+  '@typescript-eslint/explicit-function-return-type': 'error',
+  'quotes': [
+    'error',
+    'single',
+    {
+      'avoidEscape': true
+    }
+  ]
 }
 
 export default [

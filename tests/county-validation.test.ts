@@ -1,6 +1,6 @@
 import { HttpRequest, InvocationContext } from '@azure/functions'
 
-import { countyValidation } from '../src/lib/county-validation'
+import { countyValidation } from '../src/lib/county-validation.js'
 
 const mockRequest: HttpRequest = {
   method: 'GET',
@@ -19,17 +19,19 @@ const mockRequest: HttpRequest = {
   clone: null
 }
 
+const mockConsoleFunc: (...args: string[]) => void = (...args: string[]): void => { const _: string[] = args }
+
 const mockContext: InvocationContext = {
   invocationId: '81549300',
   functionName: 'test',
   extraInputs: null,
   extraOutputs: null,
-  log: console.log,
-  trace: console.trace,
-  debug: console.debug,
-  info: console.info,
-  warn: console.warn,
-  error: console.error,
+  log: mockConsoleFunc,
+  trace: mockConsoleFunc,
+  debug: mockConsoleFunc,
+  info: mockConsoleFunc,
+  warn: mockConsoleFunc,
+  error: mockConsoleFunc,
   options: null
 }
 

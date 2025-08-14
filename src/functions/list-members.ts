@@ -1,5 +1,8 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
 import { logger } from '@vtfk/logger'
+
+import { User } from '@microsoft/microsoft-graph-types'
+
 import { errorHandling } from '../middleware/error-handling.js'
 import { HTTPError } from '../lib/HTTPError.js'
 
@@ -14,7 +17,7 @@ export async function members(request: HttpRequest, context: InvocationContext):
 
   const allowedUpnSuffixes: string[] = countyValidation(request, context)
 
-  const members: string[] = await listGroupMembers(groupName, allowedUpnSuffixes)
+  const members: User[] = await listGroupMembers(groupName, allowedUpnSuffixes)
   logger('info', [`Found ${members.length} members in group '${groupName}'`], context)
 
   return { jsonBody: members }

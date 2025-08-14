@@ -12,9 +12,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json && tsc --project tsconfig_tests.json",
     "watch": "tsc -w",
-    "clean": "rimraf dist",
+    "clean": "rimraf dist && rimraf dist_tests",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "npm run lint && jest"
@@ -27,6 +27,7 @@
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/jest": "^30.0.0",
     "@types/node": "18.x",
     "@typescript-eslint/eslint-plugin": "^8.39.1",

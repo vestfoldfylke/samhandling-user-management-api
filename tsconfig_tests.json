@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "es2022",
-    "moduleResolution": "NodeNext",
+    "module": "commonjs",
+    "target": "es6",
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "outDir": "dist_tests",
     "rootDir": ".",
     "sourceMap": true,
     "strict": false,
-    "resolveJsonModule": true,
     "esModuleInterop": true
   },
   "exclude": [
     "src",
+    "types",
     "config.ts"
   ]
 }

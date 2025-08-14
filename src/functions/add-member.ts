@@ -1,15 +1,13 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
 import { logger } from '@vtfk/logger'
+
+import { AddMemberRequest } from '../../types/api.types.js'
+
 import { errorHandling } from '../middleware/error-handling.js'
 import { HTTPError } from '../lib/HTTPError.js'
 
 import { countyValidation } from '../lib/county-validation.js'
 import { addGroupMember } from '../lib/entra-functions.js'
-
-type AddMemberRequest = {
-  displayName: string
-  mail: string
-}
 
 export async function addMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   const groupName: string = request.params.groupName

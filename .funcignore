@@ -1,9 +1,10 @@
-*.js.map
 *.ts
 .git*
+.idea
 .vscode
 local.settings.json
 tests
+types
 getting_started.md
 node_modules/@types/
 node_modules/azure-functions-core-tools/

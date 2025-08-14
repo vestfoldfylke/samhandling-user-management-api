@@ -1,15 +1,13 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
 import { logger } from '@vtfk/logger'
+
+import { RemoveMemberRequest } from '../../types/api.types.js'
+
 import { errorHandling } from '../middleware/error-handling.js'
 import { HTTPError } from '../lib/HTTPError.js'
 
 import { countyValidation } from '../lib/county-validation.js'
 import { removeGroupMember } from '../lib/entra-functions.js'
-
-type RemoveMemberRequest = {
-  groupName: string
-  mail: string
-}
 
 export async function removeMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   const { groupName, mail } = request.params as RemoveMemberRequest
