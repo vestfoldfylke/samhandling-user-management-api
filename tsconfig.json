@@ -8,5 +8,8 @@
     "strict": false,
     "resolveJsonModule": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "tests"
+  ]
 }
