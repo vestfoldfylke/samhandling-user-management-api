@@ -15,7 +15,6 @@ Create `local.settings.json` with the following content:
     "BETTERSTACK_URL": "url-to-betterstack",
     "BETTERSTACK_TOKEN": "betterstack-token",
     "TEAMS_WEBHOOK_URL": "teams-flow-webhook-url",
-    "NODE_ENV": "production",
     "security-key-1": "foo.no,bar.no",
     "security-key-2": "biz.no"
   }
@@ -32,6 +31,15 @@ Create `local.settings.json` with the following content:
 >   - User.ReadWrite.All
 
 ## Setup for Azure Function App in Samhandling.org
+
+### Add the following Environment variables in the Azure Function App:
+- `AZURE_CLIENT_ID`: The client ID of the app registration used for the API.
+- `AZURE_CLIENT_SECRET`: The client secret of the app registration used for the API.
+- `AZURE_TENANT_ID`: The tenant ID of the app registration used for the
+- `BETTERSTACK_URL`: The URL to the BetterStack dashboard for monitoring. Leave out if usage of BetterStack is not desired.
+- `BETTERSTACK_TOKEN`: The token for the BetterStack dashboard. Leave out if usage of BetterStack is not desired.
+- `TEAMS_WEBHOOK_URL`: The URL to the Teams flow webhook for notifications. Leave out if usage of Teams notifications is not desired.
+- `NODE_ENV`: Set to `production` to enable logging to BetterStack and Teams notifications. If not set, it will default to `development` and not log to BetterStack or Teams.
 
 ### Setup county keys
 
