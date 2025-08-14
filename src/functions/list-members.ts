@@ -1,10 +1,10 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
 import { logger } from '@vtfk/logger'
-import { errorHandling } from '../middleware/error-handling'
-import { HTTPError } from '../lib/HTTPError'
+import { errorHandling } from '../middleware/error-handling.js'
+import { HTTPError } from '../lib/HTTPError.js'
 
-import { countyValidation } from '../lib/county-validation'
-import { listGroupMembers } from '../lib/entra-functions'
+import { countyValidation } from '../lib/county-validation.js'
+import { listGroupMembers } from '../lib/entra-functions.js'
 
 export async function members(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
   const groupName: string = request.params.groupName

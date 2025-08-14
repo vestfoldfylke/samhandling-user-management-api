@@ -1,9 +1,9 @@
-import { InvocationContext } from "@azure/functions";
-import { logger } from "@vtfk/logger"
-import { getEntraIdToken } from "./get-entraid-token"
-import { HTTPError } from "./HTTPError";
+import { InvocationContext } from '@azure/functions'
+import { logger } from '@vtfk/logger'
+import { getEntraIdToken } from './get-entraid-token.js'
+import { HTTPError } from './HTTPError.js'
 
-const scope = "https://graph.microsoft.com/.default"
+const scope = 'https://graph.microsoft.com/.default'
 
 type InvitedUser = {
   id: string
@@ -15,7 +15,7 @@ const getGraphHeaders: (scope: string) => Promise<HeadersInit> = async (scope: s
 
   return {
     Authorization: `Bearer ${entraIdToken}`,
-    "Content-Type": "application/json"
+    'Content-Type': 'application/json'
   }
 }
 
@@ -24,7 +24,7 @@ async function getGroupIdByDisplayName(groupName: string): Promise<string> {
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers
   })
 
@@ -50,7 +50,7 @@ async function getUserIdByMail(userMail: string): Promise<string> {
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers
   })
 
@@ -76,7 +76,7 @@ async function getUserById(userId: string): Promise<any> {
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers
   })
 
@@ -89,18 +89,18 @@ async function getUserById(userId: string): Promise<any> {
 }
 
 async function inviteUserByMail(userMail: string, displayName: string, context: InvocationContext): Promise<InvitedUser> {
-  const url = `https://graph.microsoft.com/v1.0/invitations`
+  const url = 'https://graph.microsoft.com/v1.0/invitations'
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const body = JSON.stringify({
     invitedUserEmailAddress: userMail,
     invitedUserDisplayName: displayName,
-    inviteRedirectUrl: "https://samhandling.org",
+    inviteRedirectUrl: 'https://samhandling.org',
     sendInvitationMessage: false
   })
 
   const response: Response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body
   })
@@ -135,7 +135,7 @@ async function patchUser(userId: string, userMail: string, context: InvocationCo
   })
 
   const response: Response = await fetch(url, {
-    method: "PATCH",
+    method: 'PATCH',
     headers,
     body
   })
@@ -156,7 +156,7 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers 
   })
 
@@ -194,11 +194,11 @@ export async function addGroupMember(groupName: string, userMail: string, displa
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const body = JSON.stringify({
-    "@odata.id": `https://graph.microsoft.com/v1.0/directoryObjects/${userId}`
+    '@odata.id': `https://graph.microsoft.com/v1.0/directoryObjects/${userId}`
   })
 
   const response: Response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body
   })
@@ -222,7 +222,7 @@ export async function removeGroupMember(groupName: string, userMail: string): Pr
   const headers: HeadersInit = await getGraphHeaders(scope)
 
   const response: Response = await fetch(url, {
-    method: "DELETE",
+    method: 'DELETE',
     headers
   })
 

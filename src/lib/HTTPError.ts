@@ -1,4 +1,4 @@
-import { HttpResponseInit } from "@azure/functions"
+import { HttpResponseInit } from '@azure/functions'
 
 export class HTTPError extends Error {
   public status: number

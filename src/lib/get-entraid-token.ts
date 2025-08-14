@@ -1,6 +1,6 @@
 import { ConfidentialClientApplication } from '@azure/msal-node'
 import NodeCache = require('node-cache')
-import { config } from '../../config'
+import { config } from '../../config.js'
 
 const cache = new NodeCache({ stdTTL: 3000 })
 

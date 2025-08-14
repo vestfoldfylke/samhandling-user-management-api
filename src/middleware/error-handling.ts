@@ -1,9 +1,9 @@
 // This line is necessary to enable source map support for better error stack traces in Node.js
-import 'source-map-support/register'
+import 'source-map-support/register.js'
 
-import { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-import { logger } from "@vtfk/logger"
-import { HTTPError } from "../lib/HTTPError";
+import { HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
+import { logger } from '@vtfk/logger'
+import { HTTPError } from '../lib/HTTPError.js'
 
 export async function errorHandling(request: HttpRequest, context: InvocationContext, next: (request: HttpRequest, context: InvocationContext) => Promise<HttpResponseInit>): Promise<HttpResponseInit> {
   try {

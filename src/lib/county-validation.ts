@@ -1,7 +1,7 @@
 import { HttpRequest, InvocationContext } from '@azure/functions'
 import { logConfig } from '@vtfk/logger'
 
-import { HTTPError } from './HTTPError'
+import { HTTPError } from './HTTPError.js'
 
 const headerKey: string = 'X-County-Key'
 const queryKey: string = 'countyKey'

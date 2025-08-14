@@ -4,7 +4,7 @@
     "target": "es2022",
     "moduleResolution": "NodeNext",
     "forceConsistentCasingInFileNames": true,
-    "outDir": "dist",
+    "outDir": "dist_tests",
     "rootDir": ".",
     "sourceMap": true,
     "strict": false,
@@ -12,6 +12,7 @@
     "esModuleInterop": true
   },
   "exclude": [
-    "tests"
+    "src",
+    "config.ts"
   ]
 }

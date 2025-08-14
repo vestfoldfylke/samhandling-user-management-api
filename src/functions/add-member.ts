@@ -1,10 +1,10 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions'
 import { logger } from '@vtfk/logger'
-import { errorHandling } from '../middleware/error-handling'
-import { HTTPError } from '../lib/HTTPError'
+import { errorHandling } from '../middleware/error-handling.js'
+import { HTTPError } from '../lib/HTTPError.js'
 
-import { countyValidation } from '../lib/county-validation'
-import { addGroupMember } from '../lib/entra-functions'
+import { countyValidation } from '../lib/county-validation.js'
+import { addGroupMember } from '../lib/entra-functions.js'
 
 type AddMemberRequest = {
   displayName: string
