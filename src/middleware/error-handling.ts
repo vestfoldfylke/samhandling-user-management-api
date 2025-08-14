@@ -13,7 +13,7 @@ export async function errorHandling(request: HttpRequest, context: InvocationCon
 
     logger('error', [request.method, request.url, 400, error.message, error.stack], context)
     return {
-      status: 401,
+      status: 400,
       body: error.message
     }
   }
