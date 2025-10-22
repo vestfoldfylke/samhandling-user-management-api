@@ -19,6 +19,7 @@ export async function members(request: HttpRequest, context: InvocationContext):
 
   const members: User[] = await listGroupMembers(groupName, allowedUpnSuffixes)
   logger('info', [`Found ${members.length} members in group '${groupName}'`], context)
+    .catch()
 
   return { jsonBody: members }
 }

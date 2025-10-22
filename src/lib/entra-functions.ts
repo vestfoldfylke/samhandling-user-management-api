@@ -112,11 +112,13 @@ async function inviteUserByMail(userMail: string, displayName: string, context: 
 
   const data: Invitation = await response.json()
   logger('info', [`Invited user with display name '${data.invitedUserDisplayName}', email '${data.invitedUserEmailAddress}' and id '${data.invitedUser.id}'`, JSON.stringify(data, null, 2)], context)
+    .catch()
 
   const user = await getUserById(data.invitedUser.id)
   let patched = false
   if (user.mail.toLowerCase() !== userMail.toLowerCase()) {
     logger('info', [`Will patch user with id '${data.invitedUser.id}' to have mail '${userMail}'`, JSON.stringify(user, null, 2)], context)
+      .catch()
     patched = await patchUser(data.invitedUser.id, userMail, context)
   }
 
@@ -146,6 +148,7 @@ async function patchUser(userId: string, userMail: string, context: InvocationCo
   }
 
   logger('warn', [`Patched user with id '${userId}' to have mail '${userMail}'`], context)
+    .catch()
 
   return true
 }

@@ -28,6 +28,7 @@ export async function addMember(request: HttpRequest, context: InvocationContext
 
   const status: number = await addGroupMember(groupName, mail, displayName, context)
   logger('info', [`${mail} added to group '${groupName}'`], context)
+    .catch()
 
   return { status }
 }

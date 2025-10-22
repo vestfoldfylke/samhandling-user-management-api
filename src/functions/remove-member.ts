@@ -23,6 +23,7 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
 
   const status: number = await removeGroupMember(groupName, mail)
   logger('info', [`${mail} removed from group '${groupName}'`], context)
+    .catch()
 
   return { status }
 }

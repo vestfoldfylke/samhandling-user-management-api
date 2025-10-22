@@ -10,11 +10,20 @@ export async function errorHandling(request: HttpRequest, context: InvocationCon
     return await next(request, context)
   } catch (error) {
     if (error instanceof HTTPError) {
-      logger('error', [request.method, request.url, error.status.toString(), error.message, error.stack], context)
+      if (error.data !== undefined) {
+        logger('error', [request.method, request.url, error.status.toString(), error.message, error.data.toString(), error.stack], context)
+          .catch()
+      } else {
+        logger('error', [request.method, request.url, error.status.toString(), error.message, error.stack], context)
+          .catch()
+      }
+
       return error.toResponse()
     }
 
     logger('error', [request.method, request.url, 400, error.message, error.stack], context)
+      .catch()
+
     return {
       status: 400,
       body: error.message
