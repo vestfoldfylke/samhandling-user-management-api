@@ -15,6 +15,8 @@ export async function errorHandling(request: HttpRequest, context: InvocationCon
     }
 
     logger('error', [request.method, request.url, 400, error.message, error.stack], context)
+      .catch()
+
     return {
       status: 400,
       body: error.message
