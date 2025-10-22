@@ -20,22 +20,22 @@
     "test": "npm run lint && jest"
   },
   "dependencies": {
-    "@azure/functions": "^4.7.2",
-    "@azure/msal-node": "^3.7.0",
-    "@vtfk/logger": "^6.3.4",
+    "@azure/functions": "^4.8.0",
+    "@azure/msal-node": "^3.8.0",
+    "@vtfk/logger": "^6.4.2",
     "node-cache": "^5.1.2",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
-    "@microsoft/microsoft-graph-types": "^2.40.0",
+    "@microsoft/microsoft-graph-types": "^2.43.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "18.x",
-    "@typescript-eslint/eslint-plugin": "^8.39.1",
-    "@typescript-eslint/parser": "^8.39.1",
-    "eslint": "^9.33.0",
-    "jest": "^30.0.5",
+    "@types/node": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint": "^9.38.0",
+    "jest": "^30.2.0",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2"
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
   }
 }
