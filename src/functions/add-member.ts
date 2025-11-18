@@ -1,5 +1,5 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
-import { logger } from "@vtfk/logger";
+import { logger } from "@vestfoldfylke/loglady";
 
 import type { AddMemberRequest } from "../../types/api.types.js";
 
@@ -8,7 +8,7 @@ import { addGroupMember } from "../lib/entra-functions.js";
 import { HTTPError } from "../lib/HTTPError.js";
 import { errorHandling } from "../middleware/error-handling.js";
 
-export async function addMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export async function addMember(request: HttpRequest, _: InvocationContext): Promise<HttpResponseInit> {
   const groupName: string = request.params.groupName;
   if (!groupName) {
     throw new HTTPError(400, "Bad Request: Missing groupName");
@@ -23,10 +23,10 @@ export async function addMember(request: HttpRequest, context: InvocationContext
     throw new HTTPError(400, "Bad Request: Missing mail in request body");
   }
 
-  countyValidation(request, context, mail);
+  countyValidation(request, mail);
 
-  const status: number = await addGroupMember(groupName, mail, displayName, context);
-  logger("info", [`${mail} added to group '${groupName}'`], context).catch();
+  const status: number = await addGroupMember(groupName, mail, displayName);
+  logger.info("EmailAddress {EmailAddress} added to GroupName '{GroupName}'", mail, groupName);
 
   return { status };
 }

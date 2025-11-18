@@ -3,10 +3,15 @@ import type { HttpResponseInit } from "@azure/functions";
 export class HTTPError extends Error {
   public readonly status: number;
   public readonly body: string;
+  public readonly data?: string;
 
-  public readonly data?: unknown;
-
-  constructor(status: number, message: string, data?: unknown) {
+  /**
+   *
+   * @param status - HTTP status code
+   * @param message - Error message
+   * @param data - Optional additional data (stringified JSON)
+   */
+  constructor(status: number, message: string, data?: string) {
     super(message);
 
     this.status = status;
@@ -15,17 +20,37 @@ export class HTTPError extends Error {
     this.name = "HTTPError";
   }
 
-  private getJsonBody(includeData: boolean = false): unknown {
+  private getBody(): string | unknown {
     try {
       return JSON.parse(this.body);
     } catch {
-      const data: unknown | undefined = this.data && includeData ? this.data : undefined;
+      return this.body;
+    }
+  }
 
+  private getData(): unknown | undefined {
+    if (!this.data) {
+      return undefined;
+    }
+
+    try {
+      return JSON.parse(this.data);
+    } catch {
+      return this.data;
+    }
+  }
+
+  private getJsonBody(includeData: boolean = false): unknown {
+    if (includeData && this.data) {
       return {
-        message: this.body,
-        data
+        body: this.getBody(),
+        data: this.getData()
       };
     }
+
+    return {
+      body: this.getBody()
+    };
   }
 
   toResponse(includeData: boolean = false): HttpResponseInit {

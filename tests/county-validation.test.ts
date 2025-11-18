@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 
-import type { HttpRequest, InvocationContext } from "@azure/functions";
+import type { HttpRequest } from "@azure/functions";
 
 import { countyValidation } from "../src/lib/county-validation.js";
 
@@ -22,27 +22,9 @@ const mockRequest: HttpRequest = {
   clone: null
 };
 
-const mockConsoleFunc: (...args: string[]) => void = (...args: string[]): void => {
-  const _: string[] = args;
-};
-
-const mockContext: InvocationContext = {
-  invocationId: "81549300",
-  functionName: "test",
-  extraInputs: null,
-  extraOutputs: null,
-  log: mockConsoleFunc,
-  trace: mockConsoleFunc,
-  debug: mockConsoleFunc,
-  info: mockConsoleFunc,
-  warn: mockConsoleFunc,
-  error: mockConsoleFunc,
-  options: null
-};
-
 describe("countyValidation should throw an error when", (): void => {
   it("headerKey and queryKey are missing", (): void => {
-    assert.throws((): string[] => countyValidation(mockRequest, mockContext));
+    assert.throws((): string[] => countyValidation(mockRequest));
   });
 
   it("headerKey is found but is invalid", (): void => {
@@ -51,7 +33,7 @@ describe("countyValidation should throw an error when", (): void => {
       headers: new Headers({ "X-County-Key": "invalidKey" })
     };
 
-    assert.throws((): string[] => countyValidation(invalidHeaderKeyRequest, mockContext));
+    assert.throws((): string[] => countyValidation(invalidHeaderKeyRequest));
   });
 
   it("queryKey is found but is invalid", (): void => {
@@ -60,7 +42,7 @@ describe("countyValidation should throw an error when", (): void => {
       query: new URLSearchParams({ countyKey: "invalidKey" })
     };
 
-    assert.throws((): string[] => countyValidation(invalidQueryKeyRequest, mockContext));
+    assert.throws((): string[] => countyValidation(invalidQueryKeyRequest));
   });
 
   it("headerKey is found and valid but specified mail is not in allowed upn suffixes", (): void => {
@@ -73,7 +55,7 @@ describe("countyValidation should throw an error when", (): void => {
       headers: new Headers({ "X-County-Key": key })
     };
 
-    assert.throws((): string[] => countyValidation(validMockKeyRequest, mockContext, mail));
+    assert.throws((): string[] => countyValidation(validMockKeyRequest, mail));
   });
 
   it("queryKey is found and valid but specified mail is not in allowed upn suffixes", (): void => {
@@ -86,7 +68,7 @@ describe("countyValidation should throw an error when", (): void => {
       query: new URLSearchParams({ countyKey: key })
     };
 
-    assert.throws((): string[] => countyValidation(validMockKeyRequest, mockContext, mail));
+    assert.throws((): string[] => countyValidation(validMockKeyRequest, mail));
   });
 });
 
@@ -100,7 +82,7 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
       headers: new Headers({ "X-County-Key": key })
     };
 
-    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mockContext);
+    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest);
     assert.strictEqual(Array.isArray(expectedSuffixes), true);
     assert.deepStrictEqual(expectedSuffixes, ["bar.no", "example.com"]);
   });
@@ -115,7 +97,7 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
       headers: new Headers({ "X-County-Key": key })
     };
 
-    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mockContext, mail);
+    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mail);
     assert.strictEqual(Array.isArray(expectedSuffixes), true);
     assert.deepStrictEqual(expectedSuffixes, ["bar.no", "example.com"]);
   });
@@ -129,7 +111,7 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
       query: new URLSearchParams({ countyKey: key })
     };
 
-    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mockContext);
+    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest);
     assert.strictEqual(Array.isArray(expectedSuffixes), true);
     assert.deepStrictEqual(expectedSuffixes, ["example.com", "bar.no"]);
   });
@@ -144,7 +126,7 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
       query: new URLSearchParams({ countyKey: key })
     };
 
-    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mockContext, mail);
+    const expectedSuffixes: string[] = countyValidation(validMockKeyRequest, mail);
     assert.strictEqual(Array.isArray(expectedSuffixes), true);
     assert.deepStrictEqual(expectedSuffixes, ["example.com", "bar.no"]);
   });

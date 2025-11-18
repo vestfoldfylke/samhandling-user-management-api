@@ -1,7 +1,6 @@
-import type { InvocationContext } from "@azure/functions";
 import type { Invitation, User } from "@microsoft/microsoft-graph-types";
 
-import { logger } from "@vtfk/logger";
+import { logger } from "@vestfoldfylke/loglady";
 
 import type { Groups, InvitedUser, Users } from "../../types/graph.types.js";
 
@@ -10,7 +9,7 @@ import { HTTPError } from "./HTTPError.js";
 
 const scope = "https://graph.microsoft.com/.default";
 
-const getGraphHeaders: (scope: string) => Promise<HeadersInit> = async (scope: string): Promise<HeadersInit> => {
+const getGraphHeaders = async (scope: string): Promise<HeadersInit> => {
   const entraIdToken: string = await getEntraIdToken(scope);
 
   return {
@@ -32,7 +31,8 @@ async function getGroupIdByDisplayName(groupName: string): Promise<string> {
     const errorData = await response.json();
     throw new HTTPError(
       response.status,
-      `Failed to fetch group id by displayName '${groupName}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to fetch group id by displayName '${groupName}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 
@@ -59,10 +59,7 @@ async function getUserIdByMail(userMail: string): Promise<string> {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new HTTPError(
-      response.status,
-      `Failed to fetch user id by mail '${userMail}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
-    );
+    throw new HTTPError(response.status, `Failed to fetch user id by mail '${userMail}' : ${response.statusText}`, JSON.stringify(errorData));
   }
 
   const data: Users = await response.json();
@@ -88,17 +85,17 @@ async function getUserById(userId: string): Promise<User> {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new HTTPError(response.status, `Failed to fetch user by id '${userId}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`);
+    throw new HTTPError(response.status, `Failed to fetch user by id '${userId}' : ${response.statusText}`, JSON.stringify(errorData));
   }
 
   return response.json();
 }
 
-async function inviteUserByMail(userMail: string, displayName: string, context: InvocationContext): Promise<InvitedUser> {
+async function inviteUserByMail(userMail: string, displayName: string): Promise<InvitedUser> {
   const url = "https://graph.microsoft.com/v1.0/invitations";
   const headers: HeadersInit = await getGraphHeaders(scope);
 
-  const body = JSON.stringify({
+  const body: string = JSON.stringify({
     invitedUserEmailAddress: userMail,
     invitedUserDisplayName: displayName,
     inviteRedirectUrl: "https://samhandling.org",
@@ -115,38 +112,43 @@ async function inviteUserByMail(userMail: string, displayName: string, context: 
     const errorData = await response.json();
     throw new HTTPError(
       response.status,
-      `Failed to invite user by mail '${userMail}' with displayName '${displayName}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to invite user by mail '${userMail}' with displayName '${displayName}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 
-  const data: Invitation = await response.json();
-  logger(
-    "info",
-    [
-      `Invited user with display name '${data.invitedUserDisplayName}', email '${data.invitedUserEmailAddress}' and id '${data.invitedUser.id}'`,
-      JSON.stringify(data, null, 2)
-    ],
-    context
-  ).catch();
+  const invitationData: Invitation = await response.json();
+  logger.info(
+    "Invited user with DisplayName '{DisplayName}', EmailAddress '{EmailAddress}' and Id '{Id}'. InvitationData: {@InvitationData}",
+    invitationData.invitedUserDisplayName,
+    invitationData.invitedUserEmailAddress,
+    invitationData.invitedUser.id,
+    invitationData
+  );
 
-  const user = await getUserById(data.invitedUser.id);
-  let patched = false;
+  const user: User = await getUserById(invitationData.invitedUser.id);
+  let patched: boolean = false;
   if (user.mail.toLowerCase() !== userMail.toLowerCase()) {
-    logger("info", [`Will patch user with id '${data.invitedUser.id}' to have mail '${userMail}'`, JSON.stringify(user, null, 2)], context).catch();
-    patched = await patchUser(data.invitedUser.id, userMail, context);
+    logger.info(
+      "Will patch user with Id '{Id}' to have EmailAddress '{EmailAddress}'. UserData: {@UserData}",
+      invitationData.invitedUser.id,
+      userMail,
+      user
+    );
+    patched = await patchUser(invitationData.invitedUser.id, userMail);
   }
 
   return {
-    id: data.invitedUser.id,
+    id: invitationData.invitedUser.id,
     patched
   };
 }
 
-async function patchUser(userId: string, userMail: string, context: InvocationContext): Promise<boolean> {
+async function patchUser(userId: string, userMail: string): Promise<boolean> {
   const url = `https://graph.microsoft.com/v1.0/users/${userId}`;
   const headers: HeadersInit = await getGraphHeaders(scope);
 
-  const body = JSON.stringify({
+  const body: string = JSON.stringify({
     mail: userMail
   });
 
@@ -160,11 +162,12 @@ async function patchUser(userId: string, userMail: string, context: InvocationCo
     const errorData = await response.json();
     throw new HTTPError(
       response.status,
-      `Failed to patch user with id '${userId}' with mail '${userMail}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to patch user with id '${userId}' with mail '${userMail}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 
-  logger("warn", [`Patched user with id '${userId}' to have mail '${userMail}'`], context).catch();
+  logger.warn("Patched user with Id '{Id}' to have EmailAddress '{EmailAddress}'", userId, userMail);
 
   return true;
 }
@@ -183,18 +186,19 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
     const errorData = await response.json();
     throw new HTTPError(
       response.status,
-      `Failed to fetch group members from group '${groupName}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to fetch group members from group '${groupName}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 
   const data: Users = await response.json();
   return data.value.filter((member: User): boolean => {
     const userMail: string = member.mail.trim().toLowerCase();
-    return allowedUpnSuffixes.some((suffix) => userMail.endsWith(suffix));
+    return allowedUpnSuffixes.some((suffix: string) => userMail.endsWith(suffix));
   });
 }
 
-export async function addGroupMember(groupName: string, userMail: string, displayName: string, context: InvocationContext): Promise<number> {
+export async function addGroupMember(groupName: string, userMail: string, displayName: string): Promise<number> {
   const groupId: string = await getGroupIdByDisplayName(groupName);
 
   let userId: string;
@@ -202,19 +206,19 @@ export async function addGroupMember(groupName: string, userMail: string, displa
   try {
     userId = await getUserIdByMail(userMail);
   } catch (error) {
-    if (error instanceof HTTPError && error.status === 404) {
-      const invitedUser: InvitedUser = await inviteUserByMail(userMail, displayName, context);
-      userId = invitedUser.id;
-      patched = invitedUser.patched;
-    } else {
+    if (!(error instanceof HTTPError && error.status === 404)) {
       throw error;
     }
+
+    const invitedUser: InvitedUser = await inviteUserByMail(userMail, displayName);
+    userId = invitedUser.id;
+    patched = invitedUser.patched;
   }
 
   const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/$ref`;
   const headers: HeadersInit = await getGraphHeaders(scope);
 
-  const body = JSON.stringify({
+  const body: string = JSON.stringify({
     "@odata.id": `https://graph.microsoft.com/v1.0/directoryObjects/${userId}`
   });
 
@@ -232,7 +236,8 @@ export async function addGroupMember(groupName: string, userMail: string, displa
 
     throw new HTTPError(
       response.status,
-      `Failed to add mail '${userMail}' as group member to group '${groupName}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to add mail '${userMail}' as group member to group '${groupName}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 
@@ -241,7 +246,7 @@ export async function addGroupMember(groupName: string, userMail: string, displa
 
 export async function removeGroupMember(groupName: string, userMail: string): Promise<number> {
   const groupId: string = await getGroupIdByDisplayName(groupName);
-  const userId = await getUserIdByMail(userMail);
+  const userId: string = await getUserIdByMail(userMail);
   const url = `https://graph.microsoft.com/v1.0/groups/${groupId}/members/${userId}/$ref`;
   const headers: HeadersInit = await getGraphHeaders(scope);
 
@@ -254,7 +259,8 @@ export async function removeGroupMember(groupName: string, userMail: string): Pr
     const errorData = await response.json();
     throw new HTTPError(
       response.status,
-      `Failed to remove mail '${userMail}' from group '${groupName}' : ${response.statusText} - ${JSON.stringify(errorData, null, 2)}`
+      `Failed to remove mail '${userMail}' from group '${groupName}' : ${response.statusText}`,
+      JSON.stringify(errorData)
     );
   }
 

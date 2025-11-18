@@ -1,15 +1,16 @@
-import { ConfidentialClientApplication } from "@azure/msal-node";
+import { type AuthenticationResult, ConfidentialClientApplication } from "@azure/msal-node";
 import NodeCache from "node-cache";
 
 import { config } from "../../config.js";
+import { HTTPError } from "./HTTPError.js";
 
 const cache = new NodeCache({ stdTTL: 3000 });
 
-export async function getEntraIdToken(scope: string, forceNew: boolean = false): Promise<string> {
+export async function getEntraIdToken(scope: string): Promise<string> {
   const cacheKey: string = scope;
 
   const cacheEntry: string = cache.get(cacheKey);
-  if (!forceNew && cacheEntry) {
+  if (cacheEntry) {
     return cacheEntry;
   }
 
@@ -27,8 +28,12 @@ export async function getEntraIdToken(scope: string, forceNew: boolean = false):
     scopes: [scope]
   };
 
-  const token = await cca.acquireTokenByClientCredential(clientCredentials);
-  const expires = Math.floor((token.expiresOn.getTime() - Date.now()) / 1000);
+  const token: AuthenticationResult | null = await cca.acquireTokenByClientCredential(clientCredentials);
+  if (!token) {
+    throw new HTTPError(401, "Failed to acquire token with specified clientCredentials", JSON.stringify(clientCredentials));
+  }
+
+  const expires: number = Math.floor((token.expiresOn.getTime() - Date.now()) / 1000);
   cache.set(cacheKey, token.accessToken, expires);
 
   return token.accessToken;

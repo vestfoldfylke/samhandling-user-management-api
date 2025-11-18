@@ -1,5 +1,5 @@
 import { app, type HttpRequest, type HttpResponseInit, type InvocationContext } from "@azure/functions";
-import { logger } from "@vtfk/logger";
+import { logger } from "@vestfoldfylke/loglady";
 
 import type { RemoveMemberRequest } from "../../types/api.types.js";
 
@@ -8,7 +8,7 @@ import { removeGroupMember } from "../lib/entra-functions.js";
 import { HTTPError } from "../lib/HTTPError.js";
 import { errorHandling } from "../middleware/error-handling.js";
 
-export async function removeMember(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export async function removeMember(request: HttpRequest, _: InvocationContext): Promise<HttpResponseInit> {
   const { groupName, mail } = request.params as RemoveMemberRequest;
   if (!groupName) {
     throw new HTTPError(400, "Bad Request: Missing parameter groupName");
@@ -18,10 +18,10 @@ export async function removeMember(request: HttpRequest, context: InvocationCont
     throw new HTTPError(400, "Bad Request: Missing parameter mail");
   }
 
-  countyValidation(request, context, mail);
+  countyValidation(request, mail);
 
   const status: number = await removeGroupMember(groupName, mail);
-  logger("info", [`${mail} removed from group '${groupName}'`], context).catch();
+  logger.info("EmailAdderss {EmailAddress} removed from GroupName '{GroupName}'", mail, groupName);
 
   return { status };
 }
