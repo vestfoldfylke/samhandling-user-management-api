@@ -23,7 +23,7 @@
   "dependencies": {
     "@azure/functions": "^4.8.0",
     "@azure/msal-node": "^3.8.0",
-    "@vestfoldfylke/loglady": "^1.4.0",
+    "@vestfoldfylke/loglady": "^1.4.1",
     "node-cache": "^5.1.2",
     "source-map-support": "^0.5.21"
   },
