@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "nodenext",
     "target": "ES2022",
-    "moduleResolution": "Node",
+    "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "rootDir": ".",

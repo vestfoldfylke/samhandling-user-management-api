@@ -3,9 +3,7 @@ import "source-map-support/register.js";
 
 import type { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-import { logger } from "@vestfoldfylke/loglady";
-
-import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/types/log-config.types";
+import { type LogConfig, logger } from "@vestfoldfylke/loglady";
 
 import { HTTPError } from "../lib/HTTPError.js";
 import { runInContext } from "./async-local-storage.js";
