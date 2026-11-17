@@ -16,7 +16,7 @@ jobs:
       (github.event_name == 'release' && github.event.release.target_commitish == 'main')
     uses: vestfoldfylke/shared/.github/workflows/deploy-az-app-service-node.yml@main
     with:
-      azure_appname: 'samhandling-user-management'
-      azure_functionapp_package_path: '.'
+      azure_appname: "samhandling-user-management"
+      azure_functionapp_package_path: "."
     secrets:
       azure_publishprofile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_PROD }}
