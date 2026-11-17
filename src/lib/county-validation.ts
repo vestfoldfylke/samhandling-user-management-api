@@ -6,7 +6,7 @@ import { HTTPError } from "./HTTPError.js";
 const headerKey: string = "X-County-Key";
 const queryKey: string = "countyKey";
 
-const getPartiallyMaskedKey = (key: string): string => {
+export const getPartiallyMaskedKey = (key: string): string => {
   if (key.length > 10) {
     const middleLength: number = key.length - 10;
     return key.slice(0, 5) + "*".repeat(Math.max(middleLength, 0)) + key.slice(-5);

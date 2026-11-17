@@ -3,7 +3,9 @@ import { describe, it } from "node:test";
 
 import type { HttpRequest } from "@azure/functions";
 
-import { countyValidation } from "../src/lib/county-validation.js";
+import { countyValidation, getPartiallyMaskedKey } from "../src/lib/county-validation.js";
+
+const NUMBER_OF_VISIBLE_CHARS: number = 2;
 
 const mockRequest: HttpRequest = {
   method: "GET",
@@ -130,4 +132,62 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
     assert.strictEqual(Array.isArray(expectedSuffixes), true);
     assert.deepStrictEqual(expectedSuffixes, ["example.com", "bar.no"]);
   });
+});
+
+describe("getPartiallyMaskedKey should return", () => {
+  it("an empty string when an empty string is passed", () => {
+    const maskedKey: string = getPartiallyMaskedKey("");
+
+    assert.strictEqual(maskedKey, "", `Expected an empty string, got ${maskedKey}`);
+  });
+
+  it("'a' when a string with 1 'a' is passed", () => {
+    const maskedKey: string = getPartiallyMaskedKey("a");
+
+    assert.strictEqual(maskedKey, "a", `Expected a string with 1 'a', got ${maskedKey}`);
+  });
+
+  it("'aa' when a string with 2 a's is passed", () => {
+    const maskedKey: string = getPartiallyMaskedKey("aa");
+
+    assert.strictEqual(maskedKey, "aa", `Expected a string with 2 a's, got ${maskedKey}`);
+  });
+
+  for (let i = 3; i < 11; i++) {
+    const expectedNumberOfAsterisks: number = i - NUMBER_OF_VISIBLE_CHARS;
+
+    it(`a string with ${expectedNumberOfAsterisks} *'s when a string with ${i} characters passed`, () => {
+      const maskedKey: string = getPartiallyMaskedKey("a".repeat(i));
+      const chars: string[] = maskedKey.split("");
+
+      const numberOfAs: number = chars.filter((char: string) => char === "a").length;
+      const numberOfAsterisks: number = chars.filter((char: string) => char === "*").length;
+      const expectedNumberOfAs: number = i - expectedNumberOfAsterisks;
+
+      assert.ok(numberOfAs === expectedNumberOfAs, `Expected ${expectedNumberOfAs} number of a's, got ${numberOfAs}: ${maskedKey}`);
+      assert.ok(
+        numberOfAsterisks === expectedNumberOfAsterisks,
+        `Expected ${expectedNumberOfAsterisks} number of *'s, got ${numberOfAsterisks}: ${maskedKey}`
+      );
+    });
+  }
+
+  for (let i = 11; i < 21; i++) {
+    const expectedNumberOfAsterisks: number = i - 10;
+
+    it(`a string with 5 a's, then ${expectedNumberOfAsterisks} *'s and then 5 a's, when a string with ${i} characters passed`, () => {
+      const maskedKey: string = getPartiallyMaskedKey("a".repeat(i));
+      const chars: string[] = maskedKey.split("");
+
+      const numberOfAs: number = chars.filter((char: string) => char === "a").length;
+      const numberOfAsterisks: number = chars.filter((char: string) => char === "*").length;
+      const expectedNumberOfAs: number = i - expectedNumberOfAsterisks;
+
+      assert.ok(numberOfAs === expectedNumberOfAs, `Expected ${expectedNumberOfAs} number of a's, got ${numberOfAs}: ${maskedKey}`);
+      assert.ok(
+        numberOfAsterisks === expectedNumberOfAsterisks,
+        `Expected ${expectedNumberOfAsterisks} number of *'s, got ${numberOfAsterisks}: ${maskedKey}`
+      );
+    });
+  }
 });
