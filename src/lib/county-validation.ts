@@ -6,29 +6,33 @@ import { HTTPError } from "./HTTPError.js";
 const headerKey: string = "X-County-Key";
 const queryKey: string = "countyKey";
 
-const getPartiallyMaskedKey = (key: string): string => {
+export const getPartiallyMaskedKey = (key: string): string => {
   if (key.length > 10) {
     const middleLength: number = key.length - 10;
-    return key.slice(0, 5) + "*".repeat(middleLength > 0 ? middleLength : 0) + key.slice(-5);
+    return key.slice(0, 5) + "*".repeat(Math.max(middleLength, 0)) + key.slice(-5);
   }
 
   return key.replace(/.(?=.{2})/g, "*");
 };
 
-export function countyValidation(request: HttpRequest, mail: string = null): string[] {
+export function countyValidation(request: HttpRequest, mail: string | null = null): string[] {
   const securityValue: string | null = request.query.get(queryKey) || request.headers.get(headerKey);
   if (!securityValue) {
     throw new HTTPError(401, "Unauthorized: Missing security key in header or query string");
   }
 
-  const allowedUpnSuffixString: string = process.env[securityValue];
+  const allowedUpnSuffixString: string | undefined = process.env[securityValue];
   if (typeof allowedUpnSuffixString !== "string") {
     const partiallyMaskedKey: string = getPartiallyMaskedKey(securityValue);
     throw new HTTPError(401, "Unauthorized: Invalid security key in header or query string", `Partially masked key: ${partiallyMaskedKey}`);
   }
 
-  const allowedUpnSuffixes: string[] = allowedUpnSuffixString.split(",").map((suffix: string) => suffix.trim().toLowerCase());
-  const userMail: string = mail ? mail.trim().toLowerCase() : null;
+  const allowedUpnSuffixes: string[] = allowedUpnSuffixString
+    .split(",")
+    .map((suffix: string) => suffix.trim().toLowerCase().replace(/^@*/, ""))
+    .filter((domain: string) => domain.length > 0)
+    .map((domain: string) => `@${domain}`);
+  const userMail: string | null = mail ? mail.trim().toLowerCase() : null;
 
   if (userMail && !allowedUpnSuffixes.some((suffix: string) => userMail.endsWith(suffix))) {
     const partiallyMaskedKey: string = getPartiallyMaskedKey(securityValue);

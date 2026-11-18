@@ -12,7 +12,7 @@ jobs:
   build-and-deploy:
     uses: vestfoldfylke/shared/.github/workflows/deploy-az-app-service-node.yml@main
     with:
-      azure_appname: 'test-samhandling-user-management'
-      azure_functionapp_package_path: '.'
+      azure_appname: "test-samhandling-user-management"
+      azure_functionapp_package_path: "."
     secrets:
       azure_publishprofile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_TEST }}

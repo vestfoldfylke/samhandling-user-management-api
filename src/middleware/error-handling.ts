@@ -38,7 +38,7 @@ export async function errorHandling(
 
       return {
         status: 400,
-        body: error.message
+        body: (error as Error).message
       };
     } finally {
       await logger.flush();

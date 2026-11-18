@@ -45,7 +45,12 @@ async function getGroupIdByDisplayName(groupName: string): Promise<string> {
     throw new HTTPError(500, `Multiple groups found with display name '${groupName}'`);
   }
 
-  return data.value[0].id;
+  const groupId: string | undefined = data.value[0].id;
+  if (!groupId) {
+    throw new HTTPError(404, `Group with display name '${groupName}' not found`);
+  }
+
+  return groupId;
 }
 
 async function getUserIdByMail(userMail: string): Promise<string> {
@@ -71,7 +76,12 @@ async function getUserIdByMail(userMail: string): Promise<string> {
     throw new HTTPError(500, `Multiple users found with mail '${userMail}'`);
   }
 
-  return data.value[0].id;
+  const userId: string | undefined = data.value[0].id;
+  if (!userId) {
+    throw new HTTPError(404, `User with mail '${userMail}' not found`);
+  }
+
+  return userId;
 }
 
 async function getUserById(userId: string): Promise<User> {
@@ -118,28 +128,45 @@ async function inviteUserByMail(userMail: string, displayName: string): Promise<
   }
 
   const invitationData: Invitation = await response.json();
+  const invitedUserId: string | undefined = invitationData.invitedUser?.id;
+  if (!invitedUserId) {
+    throw new HTTPError(400, `Invited user id not present in invitation data for user with displayName ${displayName} and mail ${userMail}`);
+  }
+
   logger.info(
     "Invited user with DisplayName '{DisplayName}', EmailAddress '{EmailAddress}' and Id '{Id}'. InvitationData: {@InvitationData}",
     invitationData.invitedUserDisplayName,
     invitationData.invitedUserEmailAddress,
-    invitationData.invitedUser.id,
+    invitedUserId,
     invitationData
   );
 
-  const user: User = await getUserById(invitationData.invitedUser.id);
-  let patched: boolean = false;
-  if (user.mail.toLowerCase() !== userMail.toLowerCase()) {
-    logger.info(
-      "Will patch user with Id '{Id}' to have EmailAddress '{EmailAddress}'. UserData: {@UserData}",
-      invitationData.invitedUser.id,
-      userMail,
-      user
+  const invitedUser: User = await getUserById(invitedUserId);
+  const invitedUserMail: string | undefined | null = invitedUser.mail;
+  if (!invitedUserMail) {
+    logger.error(
+      `Invited user mail not found for invited user with DisplayName '{DisplayName}' and Id '{Id}'. InvitationData: {@InvitationData}`,
+      displayName,
+      invitedUserId,
+      invitationData
     );
-    patched = await patchUser(invitationData.invitedUser.id, userMail);
+
+    throw new HTTPError(400, `Invited user mail not found for invited user with DisplayName '${displayName}' and Id '${invitedUserId}'`);
+  }
+
+  let patched: boolean = false;
+  if (invitedUserMail.toLowerCase() !== userMail.toLowerCase()) {
+    logger.info(
+      "Will patch invited user with Id '{Id}' to have EmailAddress '{EmailAddress}'. UserData: {@UserData}",
+      invitedUserId,
+      userMail,
+      invitedUser
+    );
+    patched = await patchUser(invitedUserId, userMail);
   }
 
   return {
-    id: invitationData.invitedUser.id,
+    id: invitedUserId,
     patched
   };
 }
@@ -193,6 +220,10 @@ export async function listGroupMembers(groupName: string, allowedUpnSuffixes: st
 
   const data: Users = await response.json();
   return data.value.filter((member: User): boolean => {
+    if (!member.mail) {
+      return false;
+    }
+
     const userMail: string = member.mail.trim().toLowerCase();
     return allowedUpnSuffixes.some((suffix: string) => userMail.endsWith(suffix));
   });
