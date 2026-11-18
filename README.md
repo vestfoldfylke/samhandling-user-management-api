@@ -16,14 +16,14 @@ Create `local.settings.json` with the following content:
     "BETTERSTACK_URL": "url-to-betterstack",
     "BETTERSTACK_TOKEN": "betterstack-token",
     "TEAMS_WEBHOOK_URL": "teams-flow-webhook-url",
-    "security-key-1": "foo.no,bar.no",
-    "security-key-2": "biz.no"
+    "security-key-1": "@foo.no,@bar.no",
+    "security-key-2": "@biz.no"
   }
 }
 ```
 
 > [!IMPORTANT]
-> - Replace `security-key-X` with an actual generated security key and the correct corresponding domains for this security key.<br />
+> - Replace `security-key-X` with an actual generated security key and the correct corresponding domains for this security key. `Remember to start each domain with '@'!`<br />
 > - Only the security keys specified will be allowed to access the API.<br />
 > - This API will only consider users who have an email address in the specified domains for the given security key.<br />
 > - Replace AZURE_CLIENT* entries with an app registration which has the following application permissions:
@@ -45,13 +45,13 @@ Create `local.settings.json` with the following content:
 
 ### Setup county keys
 
-Add a new Environment variable in the Azure Function App with the name `Organisasjon_RandomGUID` and set the value to a comma-separated list of domains that should be allowed for this security key.<br />
+Add a new Environment variable in the Azure Function App with the name `Organisasjon_RandomGUID` and set the value to a comma-separated list of domains that should be allowed for this security key. `Remember to start each domain with '@'!`<br />
 A random GUID can be generated using an online GUID generator, by using the `uuid` command in a terminal or `New-GUID` in PowerShell
 
 Example:
 
 ```text
-Organisasjonsprefix_12345678-1234-1234-1234-123456789012 = foo.no,bar.no
+Organisasjonsprefix_12345678-1234-1234-1234-123456789012 = @foo.no,@bar.no
 ```
 
 ### Setup Function App keys

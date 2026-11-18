@@ -9,7 +9,7 @@ const cache = new NodeCache({ stdTTL: 3000 });
 export async function getEntraIdToken(scope: string): Promise<string> {
   const cacheKey: string = scope;
 
-  const cacheEntry: string = cache.get(cacheKey);
+  const cacheEntry: string | undefined = cache.get(cacheKey);
   if (cacheEntry) {
     return cacheEntry;
   }
@@ -33,7 +33,8 @@ export async function getEntraIdToken(scope: string): Promise<string> {
     throw new HTTPError(401, "Failed to acquire token with specified clientCredentials", JSON.stringify(clientCredentials));
   }
 
-  const expires: number = Math.floor((token.expiresOn.getTime() - Date.now()) / 1000);
+  const expireDate: Date = token.expiresOn || new Date(Date.now() + 3600000);
+  const expires: number = Math.floor((expireDate.getTime() - Date.now()) / 1000);
   cache.set(cacheKey, token.accessToken, expires);
 
   return token.accessToken;

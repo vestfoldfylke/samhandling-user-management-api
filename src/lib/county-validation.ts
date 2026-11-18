@@ -15,20 +15,23 @@ export const getPartiallyMaskedKey = (key: string): string => {
   return key.replace(/.(?=.{2})/g, "*");
 };
 
-export function countyValidation(request: HttpRequest, mail: string = null): string[] {
+export function countyValidation(request: HttpRequest, mail: string | null = null): string[] {
   const securityValue: string | null = request.query.get(queryKey) || request.headers.get(headerKey);
   if (!securityValue) {
     throw new HTTPError(401, "Unauthorized: Missing security key in header or query string");
   }
 
-  const allowedUpnSuffixString: string = process.env[securityValue];
+  const allowedUpnSuffixString: string | undefined = process.env[securityValue];
   if (typeof allowedUpnSuffixString !== "string") {
     const partiallyMaskedKey: string = getPartiallyMaskedKey(securityValue);
     throw new HTTPError(401, "Unauthorized: Invalid security key in header or query string", `Partially masked key: ${partiallyMaskedKey}`);
   }
 
-  const allowedUpnSuffixes: string[] = allowedUpnSuffixString.split(",").map((suffix: string) => suffix.trim().toLowerCase());
-  const userMail: string = mail ? mail.trim().toLowerCase() : null;
+  const allowedUpnSuffixes: string[] = allowedUpnSuffixString
+    .split(",")
+    .map((suffix: string) => suffix.trim().toLowerCase())
+    .filter((suffix: string) => suffix.length > 0);
+  const userMail: string | null = mail ? mail.trim().toLowerCase() : null;
 
   if (userMail && !allowedUpnSuffixes.some((suffix: string) => userMail.endsWith(suffix))) {
     const partiallyMaskedKey: string = getPartiallyMaskedKey(securityValue);
