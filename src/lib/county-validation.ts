@@ -29,8 +29,9 @@ export function countyValidation(request: HttpRequest, mail: string | null = nul
 
   const allowedUpnSuffixes: string[] = allowedUpnSuffixString
     .split(",")
-    .map((suffix: string) => suffix.trim().toLowerCase())
-    .filter((suffix: string) => suffix.length > 0);
+    .map((suffix: string) => suffix.trim().toLowerCase().replace(/^@*/, ""))
+    .filter((domain: string) => domain.length > 0)
+    .map((domain: string) => `@${domain}`);
   const userMail: string | null = mail ? mail.trim().toLowerCase() : null;
 
   if (userMail && !allowedUpnSuffixes.some((suffix: string) => userMail.endsWith(suffix))) {

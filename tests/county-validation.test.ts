@@ -71,6 +71,20 @@ describe("countyValidation should throw an error when", (): void => {
     assert.throws((): string[] => countyValidation(request, "foo@evilbar.no"), isHttpErrorWithStatus(403));
   });
 
+  it("mail domain only ends with an allowed upn suffix that is configured without a leading '@'", (): void => {
+    process.env[VALID_KEY] = "bar.no";
+    const request: HttpRequest = createRequest({ headers: { [HEADER_KEY]: VALID_KEY } });
+
+    assert.throws((): string[] => countyValidation(request, "foo@evilbar.no"), isHttpErrorWithStatus(403));
+  });
+
+  it("allowed upn suffixes contain only a bare '@' entry", (): void => {
+    process.env[VALID_KEY] = "@";
+    const request: HttpRequest = createRequest({ headers: { [HEADER_KEY]: VALID_KEY } });
+
+    assert.throws((): string[] => countyValidation(request, "foo@example.com"), isHttpErrorWithStatus(403));
+  });
+
   it("allowed upn suffixes contain an empty entry and mail is not in the remaining suffixes", (): void => {
     process.env[VALID_KEY] = "@bar.no, ,";
     const request: HttpRequest = createRequest({ headers: { [HEADER_KEY]: VALID_KEY } });
@@ -119,10 +133,19 @@ describe("countyValidation should return allowed upn suffixes when", (): void =>
   });
 
   it("allowed upn suffixes contain empty entries, which are left out", (): void => {
-    process.env[VALID_KEY] = "@bar.no, , @example.com,";
+    process.env[VALID_KEY] = "@bar.no, , @, @example.com,";
     const request: HttpRequest = createRequest({ headers: { [HEADER_KEY]: VALID_KEY } });
 
     const allowedUpnSuffixes: string[] = countyValidation(request);
+
+    assert.deepStrictEqual(allowedUpnSuffixes, ["@bar.no", "@example.com"]);
+  });
+
+  it("allowed upn suffixes are configured without or with repeated leading '@', which are normalised to one '@'", (): void => {
+    process.env[VALID_KEY] = "bar.no, @@example.com";
+    const request: HttpRequest = createRequest({ headers: { [HEADER_KEY]: VALID_KEY } });
+
+    const allowedUpnSuffixes: string[] = countyValidation(request, "foo@bar.no");
 
     assert.deepStrictEqual(allowedUpnSuffixes, ["@bar.no", "@example.com"]);
   });
